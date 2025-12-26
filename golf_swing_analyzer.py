@@ -19,7 +19,7 @@ class GolfSwingAnalyzer:
     
     def __init__(self, camera1_id=0, camera2_id=1, output_dir="output", 
                  buffer_seconds=5, cooldown_seconds=3, motion_threshold=500,
-                 fps=30, resolution=(640, 480)):
+                 fps=30, resolution=(640, 480), post_swing_seconds=2):
         """
         Initialize the Golf Swing Analyzer.
         
@@ -32,6 +32,7 @@ class GolfSwingAnalyzer:
             motion_threshold: Threshold for motion detection (lower = more sensitive)
             fps: Frames per second for capture and output
             resolution: Tuple of (width, height) for camera resolution
+            post_swing_seconds: Seconds to record after motion stops
         """
         self.camera1_id = camera1_id
         self.camera2_id = camera2_id
@@ -63,11 +64,13 @@ class GolfSwingAnalyzer:
         # Motion detection
         self.prev_frame1 = None
         self.prev_frame2 = None
+        self.current_frame1 = None
+        self.current_frame2 = None
         self.motion_start_time = None
         self.motion_detected = False
         self.frames_since_motion = 0
         self.min_motion_duration = 0.3  # Minimum duration of motion to consider it a swing
-        self.post_motion_frames = int(fps * 2)  # Record for 2 seconds after motion stops
+        self.post_motion_frames = int(fps * post_swing_seconds)  # Record after motion stops
         
     def initialize_cameras(self):
         """Initialize both cameras with proper settings."""
@@ -187,6 +190,10 @@ class GolfSwingAnalyzer:
             print("Failed to read from cameras")
             return False
         
+        # Store current frames for display
+        self.current_frame1 = frame1
+        self.current_frame2 = frame2
+        
         # Detect motion in both cameras
         motion1 = self.detect_motion(frame1, self.prev_frame1)
         motion2 = self.detect_motion(frame2, self.prev_frame2)
@@ -270,12 +277,10 @@ class GolfSwingAnalyzer:
                 
                 # Display live feed if requested
                 if display:
-                    ret1, display_frame1 = self.cap1.read()
-                    ret2, display_frame2 = self.cap2.read()
-                    
-                    if ret1 and ret2:
-                        # Create display frame
-                        display_frame = self.combine_frames_side_by_side(display_frame1, display_frame2)
+                    if self.current_frame1 is not None and self.current_frame2 is not None:
+                        # Create display frame from stored frames
+                        display_frame = self.combine_frames_side_by_side(
+                            self.current_frame1, self.current_frame2)
                         
                         # Add status text
                         status = "RECORDING" if self.is_recording else "MONITORING"
@@ -317,7 +322,8 @@ def main():
         cooldown_seconds=5,     # Wait 5 seconds between swing detections
         motion_threshold=500,   # Motion detection sensitivity
         fps=30,                 # Frames per second
-        resolution=(640, 480)   # Camera resolution
+        resolution=(640, 480),  # Camera resolution
+        post_swing_seconds=2    # Record 2 seconds after motion stops
     )
     
     try:
