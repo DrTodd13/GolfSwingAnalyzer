@@ -21,7 +21,8 @@ MIN_MOTION_DURATION = 0.3  # Minimum seconds of sustained motion to trigger reco
 
 # Video Configuration
 FPS = 30  # Frames per second for capture and output
-RESOLUTION = (640, 480)  # (width, height) - adjust based on your cameras
+RESOLUTION_CAMERA1 = (640, 480)  # (width, height) for camera 1 (front-facing)
+RESOLUTION_CAMERA2 = (640, 480)  # (width, height) for camera 2 (back-facing)
 
 # Display Configuration
 DISPLAY_LIVE_FEED = True  # Show live camera feed window (press 'q' to quit)

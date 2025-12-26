@@ -23,7 +23,8 @@ def main():
         cooldown_seconds=config.COOLDOWN_SECONDS,
         motion_threshold=config.MOTION_THRESHOLD,
         fps=config.FPS,
-        resolution=config.RESOLUTION,
+        resolution_camera1=config.RESOLUTION_CAMERA1,
+        resolution_camera2=config.RESOLUTION_CAMERA2,
         post_swing_seconds=config.POST_SWING_SECONDS
     )
     

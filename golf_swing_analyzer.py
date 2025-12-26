@@ -19,7 +19,8 @@ class GolfSwingAnalyzer:
     
     def __init__(self, camera1_id=0, camera2_id=1, output_dir="output", 
                  buffer_seconds=5, cooldown_seconds=3, motion_threshold=500,
-                 fps=30, resolution=(640, 480), post_swing_seconds=2):
+                 fps=30, resolution_camera1=(640, 480), resolution_camera2=(640, 480), 
+                 post_swing_seconds=2):
         """
         Initialize the Golf Swing Analyzer.
         
@@ -31,7 +32,8 @@ class GolfSwingAnalyzer:
             cooldown_seconds: Seconds to wait after detecting a swing before detecting next
             motion_threshold: Threshold for motion detection (lower = more sensitive)
             fps: Frames per second for capture and output
-            resolution: Tuple of (width, height) for camera resolution
+            resolution_camera1: Tuple of (width, height) for camera 1 resolution
+            resolution_camera2: Tuple of (width, height) for camera 2 resolution
             post_swing_seconds: Seconds to record after motion stops
         """
         self.camera1_id = camera1_id
@@ -41,7 +43,8 @@ class GolfSwingAnalyzer:
         self.cooldown_seconds = cooldown_seconds
         self.motion_threshold = motion_threshold
         self.fps = fps
-        self.resolution = resolution
+        self.resolution_camera1 = resolution_camera1
+        self.resolution_camera2 = resolution_camera2
         
         # Create output directory if it doesn't exist
         os.makedirs(output_dir, exist_ok=True)
@@ -77,11 +80,15 @@ class GolfSwingAnalyzer:
         self.cap1 = cv2.VideoCapture(self.camera1_id)
         self.cap2 = cv2.VideoCapture(self.camera2_id)
         
-        # Set camera properties
-        for cap in [self.cap1, self.cap2]:
-            cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.resolution[0])
-            cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.resolution[1])
-            cap.set(cv2.CAP_PROP_FPS, self.fps)
+        # Set camera properties for camera 1
+        self.cap1.set(cv2.CAP_PROP_FRAME_WIDTH, self.resolution_camera1[0])
+        self.cap1.set(cv2.CAP_PROP_FRAME_HEIGHT, self.resolution_camera1[1])
+        self.cap1.set(cv2.CAP_PROP_FPS, self.fps)
+        
+        # Set camera properties for camera 2
+        self.cap2.set(cv2.CAP_PROP_FRAME_WIDTH, self.resolution_camera2[0])
+        self.cap2.set(cv2.CAP_PROP_FRAME_HEIGHT, self.resolution_camera2[1])
+        self.cap2.set(cv2.CAP_PROP_FPS, self.fps)
         
         # Verify cameras are opened
         if not self.cap1.isOpened():
@@ -315,15 +322,16 @@ def main():
     """Main entry point for the application."""
     # Configuration
     analyzer = GolfSwingAnalyzer(
-        camera1_id=0,           # Front camera
-        camera2_id=1,           # Back camera
-        output_dir="output",    # Output directory for videos
-        buffer_seconds=3,       # Keep 3 seconds of video before swing
-        cooldown_seconds=5,     # Wait 5 seconds between swing detections
-        motion_threshold=500,   # Motion detection sensitivity
-        fps=30,                 # Frames per second
-        resolution=(640, 480),  # Camera resolution
-        post_swing_seconds=2    # Record 2 seconds after motion stops
+        camera1_id=0,                       # Front camera
+        camera2_id=1,                       # Back camera
+        output_dir="output",                # Output directory for videos
+        buffer_seconds=3,                   # Keep 3 seconds of video before swing
+        cooldown_seconds=5,                 # Wait 5 seconds between swing detections
+        motion_threshold=500,               # Motion detection sensitivity
+        fps=30,                             # Frames per second
+        resolution_camera1=(640, 480),      # Camera 1 resolution
+        resolution_camera2=(640, 480),      # Camera 2 resolution
+        post_swing_seconds=2                # Record 2 seconds after motion stops
     )
     
     try:

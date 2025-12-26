@@ -56,7 +56,7 @@ Edit `config.py` to customize:
 - **Motion Threshold**: Adjust sensitivity for swing detection
 - **Buffer Duration**: How many seconds before the swing to include
 - **Cooldown Period**: Time to wait between detecting swings
-- **Video Resolution**: Camera capture resolution
+- **Video Resolution**: Camera capture resolution (can be set independently for each camera)
 - **FPS**: Frames per second for capture and output
 
 ### Controls
